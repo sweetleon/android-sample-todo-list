@@ -17,8 +17,8 @@ To start a new Android project:
 `API 19`, `Build-tools 21.1.2` and the support library. You can also install the packages from the terminal, using [android](https://developer.android.com/tools/help/android.html) from your `sdk/tools/` directory:
 
 ```bash
-android update sdk --all --no-ui --filter build-tools-21.1.2 && \
-android update sdk --all --no-ui --filter android-19 && \
+android update sdk --all --no-ui --filter build-tools-22.0.1 && \
+android update sdk --all --no-ui --filter android-22 && \
 android update sdk --all --no-ui --filter extra-android-support && \
 android update sdk --all --no-ui --filter extra-android-m2repository
 ```
