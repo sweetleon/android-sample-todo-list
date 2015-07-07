@@ -51,5 +51,8 @@ dependencies {
         exclude group: 'commons-logging', module: 'commons-logging'
         exclude group: 'org.apache.httpcomponents', module: 'httpclient'
     }
+    testCompile('com.squareup.assertj:assertj-android:1.0.0') {
+        exclude group:'com.android.support', module:'support-annotations'
+    }
 }
 
