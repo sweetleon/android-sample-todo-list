@@ -1,6 +1,8 @@
 package com.example.activity;
 
 import android.view.View;
+import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 import com.example.R;
 import org.junit.Before;
@@ -12,7 +14,9 @@ import org.robolectric.annotation.Config;
 
 import org.robolectric.util.ActivityController;
 
+import static junit.framework.Assert.fail;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.robolectric.Robolectric.shadowOf;
 
 
 @RunWith(RobolectricTestRunner.class)
@@ -37,5 +41,20 @@ public class DeckardActivityTest {
     public void inputTextMustBeSingleLine() throws Exception {
         TextView input = (TextView) activity.findViewById(R.id.new_item_text);
         assertThat(input.getMaxLines()).isEqualTo(1);
+    }
+
+    @Test
+    public void pressingEnterAddsTheItem() throws Exception {
+        TextView input = (TextView) activity.findViewById(R.id.new_item_text);
+        input.setText("hello");
+
+        Button button = (Button) activity.findViewById(R.id.new_item_add);
+        button.performClick();
+
+        ListView todoList = (ListView) activity.findViewById(android.R.id.list);
+        shadowOf(todoList).populateItems();
+
+        TextView item = (TextView) todoList.getChildAt(0);
+        assertThat(item.getText()).isEqualTo("hello");
     }
 }
