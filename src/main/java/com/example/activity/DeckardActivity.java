@@ -16,6 +16,8 @@ import com.example.persistence.ToDoDatabaseContract;
 public class DeckardActivity extends Activity {
 
     private DbHelper dbHelper;
+    private ArrayAdapter<String> adapter;
+    private SQLiteDatabase writableDB;
 
 
     @Override
@@ -24,22 +26,9 @@ public class DeckardActivity extends Activity {
         setContentView(R.layout.todo_list);
 
         dbHelper = new DbHelper(this);
-        final SQLiteDatabase writableDB = dbHelper.getWritableDatabase();
+        writableDB = dbHelper.getWritableDatabase();
 
-        String[] columns = {
-                ToDoDatabaseContract.ToDoEntry.COLUMN_NAME_TEXT};
-
-
-        final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.todo_list_item);
-        Cursor c = writableDB.query(ToDoDatabaseContract.ToDoEntry.TABLE_NAME, columns, null, null, null, null, null);
-
-        while (c.moveToNext()) {
-            String value = c.getString(c.getColumnIndex(ToDoDatabaseContract.ToDoEntry.COLUMN_NAME_TEXT));
-            adapter.add(value);
-        }
-
-        final ListView list = (ListView) findViewById(android.R.id.list);
-        list.setAdapter(adapter);
+        adapter = new ArrayAdapter<String>(this, R.layout.todo_list_item);
 
         findViewById(R.id.new_item_add).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,5 +46,22 @@ public class DeckardActivity extends Activity {
                         values);
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        String[] columns = {ToDoDatabaseContract.ToDoEntry.COLUMN_NAME_TEXT};
+        Cursor c = writableDB.query(ToDoDatabaseContract.ToDoEntry.TABLE_NAME, columns, null, null, null, null, null);
+
+        adapter.clear();
+        while (c.moveToNext()) {
+            String value = c.getString(c.getColumnIndex(ToDoDatabaseContract.ToDoEntry.COLUMN_NAME_TEXT));
+            adapter.add(value);
+        }
+
+        final ListView list = (ListView) findViewById(android.R.id.list);
+        list.setAdapter(adapter);
     }
 }

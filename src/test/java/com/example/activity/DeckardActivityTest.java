@@ -74,4 +74,19 @@ public class DeckardActivityTest {
         TextView item = (TextView) todoList.getChildAt(0);
         assertThat(item.getText()).isEqualTo("hello");
     }
+
+    @Test
+    public void resumeDoesNotDuplicateItems() throws Exception {
+        TextView input = (TextView) activity.findViewById(R.id.new_item_text);
+        input.setText("hello");
+
+        Button button = (Button) activity.findViewById(R.id.new_item_add);
+        button.performClick();
+
+        activityController.pause().resume();
+
+        ListView todoList = (ListView) activity.findViewById(android.R.id.list);
+
+        assertThat(todoList.getCount()).isEqualTo(1);
+    }
 }
