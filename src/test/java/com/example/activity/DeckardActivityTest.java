@@ -1,20 +1,29 @@
 package com.example.activity;
 
 import android.app.AlertDialog;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.TextView;
 import com.example.R;
+import com.example.persistence.ToDoDatabaseContract;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
+import org.robolectric.annotation.Implementation;
+import org.robolectric.annotation.Implements;
+import org.robolectric.annotation.RealObject;
 import org.robolectric.shadows.ShadowAlertDialog;
 import org.robolectric.util.ActivityController;
 
+import static junit.framework.Assert.fail;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.robolectric.Robolectric.directlyOn;
 import static org.robolectric.Robolectric.shadowOf;
 
 
@@ -49,7 +58,7 @@ public class DeckardActivityTest {
         ListView todoList = (ListView) activity.findViewById(android.R.id.list);
         shadowOf(todoList).populateItems();
 
-        TextView item = (TextView) todoList.getChildAt(0);
+        TextView item = (TextView) todoList.getChildAt(0).findViewById(R.id.item_text);
         assertThat(item.getText()).isEqualTo("hello");
 
         AlertDialog alertDialog = ShadowAlertDialog.getLatestAlertDialog();
@@ -66,7 +75,7 @@ public class DeckardActivityTest {
         ListView todoList = (ListView) activity.findViewById(android.R.id.list);
         shadowOf(todoList).populateItems();
 
-        TextView item = (TextView) todoList.getChildAt(0);
+        TextView item = (TextView) todoList.getChildAt(0).findViewById(R.id.item_text);
         assertThat(item.getText()).isEqualTo("hello");
     }
 
@@ -101,21 +110,23 @@ public class DeckardActivityTest {
     }
 
     @Test
-    public void testScrollToEOLAfterAdd() throws Exception {
+    public void testScrollToTopAfterAdd() throws Exception {
         addItem("hello");
-        addItem("goodbye");
 
         ListView todoList = (ListView) activity.findViewById(android.R.id.list);
-        assertThat(shadowOf(todoList).getSmoothScrolledPosition()).isEqualTo(1);
-    }
+        todoList.smoothScrollToPosition(1);
 
-    private TextView addItem(String inputText) {
-        TextView input = (TextView) activity.findViewById(R.id.new_item_text);
-        input.setText(inputText);
+        addItem("goodbye");
 
-        Button button = (Button) activity.findViewById(R.id.new_item_add);
-        button.performClick();
-        return input;
+        assertThat(shadowOf(todoList).getSmoothScrolledPosition()).isEqualTo(0);
+
+        shadowOf(todoList).populateItems();
+
+        TextView item = (TextView) todoList.getChildAt(0).findViewById(R.id.item_text);
+        assertThat(item.getText()).isEqualTo("goodbye");
+
+        item = (TextView) todoList.getChildAt(1).findViewById(R.id.item_text);
+        assertThat(item.getText()).isEqualTo("hello");
     }
 
     @Test
@@ -127,7 +138,7 @@ public class DeckardActivityTest {
         ListView todoList = (ListView) activity.findViewById(android.R.id.list);
         shadowOf(todoList).populateItems();
 
-        TextView item = (TextView) todoList.getChildAt(0);
+        TextView item = (TextView) todoList.getChildAt(0).findViewById(R.id.item_text);
         assertThat(item.getText()).isEqualTo("hello");
 
         AlertDialog alertDialog = ShadowAlertDialog.getLatestAlertDialog();
@@ -145,5 +156,65 @@ public class DeckardActivityTest {
         assertThat(alertDialog).isNotNull();
 
         assertThat(input.getText()).isEmpty();
+    }
+
+    @Test
+    @Config(shadows = {QueryCapturingSqliteDatabase.class})
+    public void testMaintainOrder() throws Exception {
+        addItem("hello");
+        addItem("goodbye");
+
+        activityController = Robolectric.buildActivity(DeckardActivity.class).create().resume().visible();
+
+        assertThat(QueryCapturingSqliteDatabase.lastOrderBy).isEqualTo(ToDoDatabaseContract.ToDoEntry._ID + " DESC");
+    }
+
+    @Test
+    public void testCheckBoxAndBolded() throws Exception {
+        TextView view = addItem("hello");
+
+        ListView todoList = (ListView) activity.findViewById(android.R.id.list);
+        shadowOf(todoList).populateItems();
+
+        TextView item = (TextView) todoList.getChildAt(0).findViewById(R.id.item_text);
+        assertThat(item.getText()).isEqualTo("hello");
+
+        CheckBox checkBox = (CheckBox) todoList.getChildAt(0).findViewById(R.id.item_checkbox);
+        assertThat(checkBox.isChecked()).isFalse();
+
+        checkBox.performClick();
+
+        assertThat(checkBox.isChecked()).isTrue();
+        assertThat(item.getTypeface().isBold()).isTrue();
+        assertThat(item.getTypeface().isItalic()).isTrue();
+
+        checkBox.performClick();
+
+        assertThat(item.getTypeface()).isNull();
+    }
+
+    private TextView addItem(String inputText) {
+        TextView input = (TextView) activity.findViewById(R.id.new_item_text);
+        input.setText(inputText);
+
+        Button button = (Button) activity.findViewById(R.id.new_item_add);
+        button.performClick();
+        return input;
+    }
+
+    @Implements(SQLiteDatabase.class)
+    public static class QueryCapturingSqliteDatabase {
+        @RealObject
+        SQLiteDatabase realObject;
+        private static String lastOrderBy = "query() has never been called";
+
+        @Implementation
+        public Cursor query(String table, String[] columns, String selection,
+                            String[] selectionArgs, String groupBy, String having,
+                            String orderBy) {
+            lastOrderBy = orderBy;
+
+            return directlyOn(realObject, SQLiteDatabase.class).query(table, columns, selection, selectionArgs, groupBy, having, orderBy);
+        }
     }
 }
