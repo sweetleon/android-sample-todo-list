@@ -19,6 +19,7 @@ public class DeckardActivity extends Activity {
     private DbHelper dbHelper;
     private ArrayAdapter<String> adapter;
     private SQLiteDatabase writableDB;
+    private ListView list;
 
 
     @Override
@@ -30,6 +31,7 @@ public class DeckardActivity extends Activity {
         writableDB = dbHelper.getWritableDatabase();
 
         adapter = new ArrayAdapter<String>(this, R.layout.todo_list_item);
+        list = (ListView) findViewById(android.R.id.list);
 
         findViewById(R.id.new_item_add).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -52,6 +54,8 @@ public class DeckardActivity extends Activity {
                             values);
 
                     input.setText("");
+
+                    list.smoothScrollToPosition(adapter.getCount()-1);
                 }
             }
         });
@@ -70,7 +74,6 @@ public class DeckardActivity extends Activity {
             adapter.add(value);
         }
 
-        final ListView list = (ListView) findViewById(android.R.id.list);
         list.setAdapter(adapter);
     }
 }

@@ -6,7 +6,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import com.example.R;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
@@ -45,11 +44,7 @@ public class DeckardActivityTest {
 
     @Test
     public void pressingEnterAddsTheItem() throws Exception {
-        TextView input = (TextView) activity.findViewById(R.id.new_item_text);
-        input.setText("hello");
-
-        Button button = (Button) activity.findViewById(R.id.new_item_add);
-        button.performClick();
+        TextView input = addItem("hello");
 
         ListView todoList = (ListView) activity.findViewById(android.R.id.list);
         shadowOf(todoList).populateItems();
@@ -63,11 +58,7 @@ public class DeckardActivityTest {
 
     @Test
     public void createdItemsPersistAcrossInstances() throws Exception {
-        TextView input = (TextView) activity.findViewById(R.id.new_item_text);
-        input.setText("hello");
-
-        Button button = (Button) activity.findViewById(R.id.new_item_add);
-        button.performClick();
+        TextView input = addItem("hello");
 
         activityController = Robolectric.buildActivity(DeckardActivity.class).create().resume().visible();
         activity = activityController.get();
@@ -81,11 +72,7 @@ public class DeckardActivityTest {
 
     @Test
     public void resumeDoesNotDuplicateItems() throws Exception {
-        TextView input = (TextView) activity.findViewById(R.id.new_item_text);
-        input.setText("hello");
-
-        Button button = (Button) activity.findViewById(R.id.new_item_add);
-        button.performClick();
+        TextView input = addItem("hello");
 
         activityController.pause().resume();
 
@@ -108,12 +95,26 @@ public class DeckardActivityTest {
 
     @Test
     public void testClearTextAfterAdding() throws Exception {
+        TextView input = addItem("hello");
+
+        assertThat(input.getText()).isEmpty();
+    }
+
+    @Test
+    public void testScrollToEOLAfterAdd() throws Exception {
+        addItem("hello");
+        addItem("goodbye");
+
+        ListView todoList = (ListView) activity.findViewById(android.R.id.list);
+        assertThat(shadowOf(todoList).getSmoothScrolledPosition()).isEqualTo(1);
+    }
+
+    private TextView addItem(String inputText) {
         TextView input = (TextView) activity.findViewById(R.id.new_item_text);
-        input.setText("hello");
+        input.setText(inputText);
 
         Button button = (Button) activity.findViewById(R.id.new_item_add);
         button.performClick();
-
-        assertThat(input.getText()).isEmpty();
+        return input;
     }
 }
