@@ -50,6 +50,8 @@ public class DeckardActivity extends Activity {
                             ToDoDatabaseContract.ToDoEntry.TABLE_NAME,
                             ToDoDatabaseContract.ToDoEntry.COLUMN_NAME_TEXT,
                             values);
+
+                    input.setText("");
                 }
             }
         });

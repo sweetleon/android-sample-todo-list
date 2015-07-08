@@ -105,4 +105,15 @@ public class DeckardActivityTest {
         ListView todoList = (ListView) activity.findViewById(android.R.id.list);
         assertThat(todoList.getCount()).isEqualTo(0);
     }
+
+    @Test
+    public void testClearTextAfterAdding() throws Exception {
+        TextView input = (TextView) activity.findViewById(R.id.new_item_text);
+        input.setText("hello");
+
+        Button button = (Button) activity.findViewById(R.id.new_item_add);
+        button.performClick();
+
+        assertThat(input.getText()).isEmpty();
+    }
 }
