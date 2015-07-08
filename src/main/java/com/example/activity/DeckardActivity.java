@@ -1,6 +1,7 @@
 package com.example.activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -34,16 +35,22 @@ public class DeckardActivity extends Activity {
             @Override
             public void onClick(View view) {
                 TextView input = (TextView) findViewById(R.id.new_item_text);
-                String value = input.getText().toString();
-                adapter.add(value);
-                ContentValues values = new ContentValues();
+                CharSequence value = input.getText();
 
-                values.put(ToDoDatabaseContract.ToDoEntry.COLUMN_NAME_TEXT, value);
+                if (value == null || value.length() == 0) {
+                    new AlertDialog.Builder(view.getContext()).setMessage(getString(R.string.input_required)).create().show();
+                } else {
+                    adapter.add(value.toString());
 
-                writableDB.insert(
-                        ToDoDatabaseContract.ToDoEntry.TABLE_NAME,
-                        ToDoDatabaseContract.ToDoEntry.COLUMN_NAME_TEXT,
-                        values);
+                    ContentValues values = new ContentValues();
+
+                    values.put(ToDoDatabaseContract.ToDoEntry.COLUMN_NAME_TEXT, value.toString());
+
+                    writableDB.insert(
+                            ToDoDatabaseContract.ToDoEntry.TABLE_NAME,
+                            ToDoDatabaseContract.ToDoEntry.COLUMN_NAME_TEXT,
+                            values);
+                }
             }
         });
     }

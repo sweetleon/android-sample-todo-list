@@ -12,6 +12,7 @@ import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
+import org.robolectric.shadows.ShadowAlertDialog;
 import org.robolectric.util.ActivityController;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -55,6 +56,9 @@ public class DeckardActivityTest {
 
         TextView item = (TextView) todoList.getChildAt(0);
         assertThat(item.getText()).isEqualTo("hello");
+
+        AlertDialog alertDialog = ShadowAlertDialog.getLatestAlertDialog();
+        assertThat(alertDialog).isNull();
     }
 
     @Test
@@ -86,7 +90,19 @@ public class DeckardActivityTest {
         activityController.pause().resume();
 
         ListView todoList = (ListView) activity.findViewById(android.R.id.list);
-
         assertThat(todoList.getCount()).isEqualTo(1);
+    }
+
+    @Test
+    public void showErrorMsg_whenThereIsNoText_andDoNotAddItem() throws Exception {
+        Button button = (Button) activity.findViewById(R.id.new_item_add);
+        button.performClick();
+
+        AlertDialog alertDialog = ShadowAlertDialog.getLatestAlertDialog();
+        assertThat(alertDialog).isNotNull();
+        assertThat(shadowOf(alertDialog).getMessage()).isEqualTo("Please enter the text");
+
+        ListView todoList = (ListView) activity.findViewById(android.R.id.list);
+        assertThat(todoList.getCount()).isEqualTo(0);
     }
 }

@@ -2,4 +2,5 @@
 <resources>
     <string name="new_item_label">To do</string>
     <string name="ok">OK</string>
+    <string name="input_required">Please enter the text</string>
 </resources>
