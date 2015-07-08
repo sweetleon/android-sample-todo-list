@@ -117,4 +117,33 @@ public class DeckardActivityTest {
         button.performClick();
         return input;
     }
+
+    @Test
+    public void testHittingEnterInsteadOfAdd() throws Exception {
+        TextView input = (TextView) activity.findViewById(R.id.new_item_text);
+        input.setText("hello");
+        input.append("\n");
+
+        ListView todoList = (ListView) activity.findViewById(android.R.id.list);
+        shadowOf(todoList).populateItems();
+
+        TextView item = (TextView) todoList.getChildAt(0);
+        assertThat(item.getText()).isEqualTo("hello");
+
+        AlertDialog alertDialog = ShadowAlertDialog.getLatestAlertDialog();
+        assertThat(alertDialog).isNull();
+
+        assertThat(input.getText()).isEmpty();
+    }
+
+    @Test
+    public void testHittingEnterWithNoOtherInput() throws Exception {
+        TextView input = (TextView) activity.findViewById(R.id.new_item_text);
+        input.append("\n");
+
+        AlertDialog alertDialog = ShadowAlertDialog.getLatestAlertDialog();
+        assertThat(alertDialog).isNotNull();
+
+        assertThat(input.getText()).isEmpty();
+    }
 }

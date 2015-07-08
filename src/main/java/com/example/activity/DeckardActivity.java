@@ -6,6 +6,8 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -33,32 +35,55 @@ public class DeckardActivity extends Activity {
         adapter = new ArrayAdapter<String>(this, R.layout.todo_list_item);
         list = (ListView) findViewById(android.R.id.list);
 
+        final TextView input = (TextView) findViewById(R.id.new_item_text);
+        input.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                CharSequence inserted =  s.subSequence(start, Math.max(start, start + count));
+                if(inserted.toString().indexOf('\n') >= 0) {
+                    addItem(s.subSequence(0, start), input);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
         findViewById(R.id.new_item_add).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                TextView input = (TextView) findViewById(R.id.new_item_text);
                 CharSequence value = input.getText();
 
-                if (value == null || value.length() == 0) {
-                    new AlertDialog.Builder(view.getContext()).setMessage(getString(R.string.input_required)).create().show();
-                } else {
-                    adapter.add(value.toString());
-
-                    ContentValues values = new ContentValues();
-
-                    values.put(ToDoDatabaseContract.ToDoEntry.COLUMN_NAME_TEXT, value.toString());
-
-                    writableDB.insert(
-                            ToDoDatabaseContract.ToDoEntry.TABLE_NAME,
-                            ToDoDatabaseContract.ToDoEntry.COLUMN_NAME_TEXT,
-                            values);
-
-                    input.setText("");
-
-                    list.smoothScrollToPosition(adapter.getCount()-1);
-                }
+                addItem(value, input);
             }
         });
+    }
+
+    private void addItem(CharSequence value, TextView input) {
+        if (value == null || value.length() == 0) {
+            new AlertDialog.Builder(this).setMessage(getString(R.string.input_required)).create().show();
+        } else {
+            adapter.add(value.toString());
+
+            ContentValues values = new ContentValues();
+
+            values.put(ToDoDatabaseContract.ToDoEntry.COLUMN_NAME_TEXT, value.toString());
+
+            writableDB.insert(
+                    ToDoDatabaseContract.ToDoEntry.TABLE_NAME,
+                    ToDoDatabaseContract.ToDoEntry.COLUMN_NAME_TEXT,
+                    values);
+
+            list.smoothScrollToPosition(adapter.getCount() - 1);
+        }
+
+        input.setText("");
     }
 
     @Override
