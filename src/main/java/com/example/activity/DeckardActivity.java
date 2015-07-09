@@ -3,19 +3,23 @@ package com.example.activity;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentValues;
+import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.TextWatcher;
+import android.text.style.ClickableSpan;
+import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
-import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.*;
 import com.example.R;
 import com.example.models.ToDoItem;
 import com.example.persistence.DbHelper;
@@ -53,9 +57,14 @@ public class DeckardActivity extends Activity {
                 int typeface = item.isCompleted() ? Typeface.BOLD_ITALIC : Typeface.NORMAL;
 
                 itemText.setTypeface(null, typeface);
-
                 if (item.getText().contains(getString(R.string.travel))) {
                     itemText.setTextColor(getResources().getColor(android.R.color.holo_blue_dark));
+                    itemText.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            startActivity(new Intent(DeckardActivity.this, TravelSearchActivity.class));
+                        }
+                    });
                 }
 
                 checkBox.setOnClickListener(new View.OnClickListener() {

@@ -1,6 +1,8 @@
 package com.example.activity;
 
 import android.app.AlertDialog;
+import android.content.ComponentName;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.widget.Button;
@@ -229,6 +231,20 @@ public class DeckardActivityTest {
 
         TextView hello = (TextView) todoList.getChildAt(1).findViewById(R.id.item_text);
         assertThat(hello.getCurrentTextColor()).isNotEqualTo(Robolectric.application.getResources().getColor(android.R.color.holo_blue_dark));
+    }
+
+    @Test
+    public void testTravelItem_clickingOpensTravelInputScreen() throws Exception {
+        addItem("book travel");
+
+        ListView todoList = (ListView) activity.findViewById(android.R.id.list);
+        shadowOf(todoList).populateItems();
+
+        TextView travel = (TextView) todoList.getChildAt(0).findViewById(R.id.item_text);
+        travel.performClick();
+
+        Intent nextStartedActivity = shadowOf(activity).getNextStartedActivity();
+        assertThat(nextStartedActivity).isEqualTo(new Intent(activity, TravelSearchActivity.class));
     }
 
     private TextView addItem(String inputText) {
