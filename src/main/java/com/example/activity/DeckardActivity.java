@@ -54,6 +54,10 @@ public class DeckardActivity extends Activity {
 
                 itemText.setTypeface(null, typeface);
 
+                if (item.getText().contains(getString(R.string.travel))) {
+                    itemText.setTextColor(getResources().getColor(android.R.color.holo_blue_dark));
+                }
+
                 checkBox.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {

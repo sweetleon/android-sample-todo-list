@@ -4,4 +4,5 @@
     <string name="ok">OK</string>
     <string name="input_required">Please enter the text</string>
     <string name="app_name">TODO</string>
+    <string name="travel">travel</string>
 </resources>

@@ -216,6 +216,21 @@ public class DeckardActivityTest {
         assertThat(item2.getTypeface().isItalic()).isTrue();
     }
 
+    @Test
+    public void testWhenWordTravelEnteredTurnBlue() throws Exception {
+        addItem("hello");
+        addItem("book travel");
+
+        ListView todoList = (ListView) activity.findViewById(android.R.id.list);
+        shadowOf(todoList).populateItems();
+
+        TextView travel = (TextView) todoList.getChildAt(0).findViewById(R.id.item_text);
+        assertThat(travel.getCurrentTextColor()).isEqualTo(Robolectric.application.getResources().getColor(android.R.color.holo_blue_dark));
+
+        TextView hello = (TextView) todoList.getChildAt(1).findViewById(R.id.item_text);
+        assertThat(hello.getCurrentTextColor()).isNotEqualTo(Robolectric.application.getResources().getColor(android.R.color.holo_blue_dark));
+    }
+
     private TextView addItem(String inputText) {
         TextView input = (TextView) activity.findViewById(R.id.new_item_text);
         input.setText(inputText);
