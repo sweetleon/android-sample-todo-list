@@ -17,13 +17,14 @@ import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.TextView;
 import com.example.R;
+import com.example.models.ToDoItem;
 import com.example.persistence.DbHelper;
 import com.example.persistence.ToDoDatabaseContract;
 
 public class DeckardActivity extends Activity {
 
     private DbHelper dbHelper;
-    private ArrayAdapter<String> adapter;
+    private ArrayAdapter<ToDoItem> adapter;
     private SQLiteDatabase writableDB;
     private ListView list;
 
@@ -36,22 +37,35 @@ public class DeckardActivity extends Activity {
         dbHelper = new DbHelper(this);
         writableDB = dbHelper.getWritableDatabase();
 
-        adapter = new ArrayAdapter<String>(this, R.layout.todo_list_item) {
+        adapter = new ArrayAdapter<ToDoItem>(this, R.layout.todo_list_item) {
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
                 View view = LayoutInflater.from(DeckardActivity.this).inflate(R.layout.todo_list_item, parent, false);
+
                 final TextView itemText = (TextView) view.findViewById(R.id.item_text);
-                itemText.setText(getItem(position));
+                final ToDoItem item = getItem(position);
+                itemText.setText(item.getText());
 
                 final CheckBox checkBox = (CheckBox) view.findViewById(R.id.item_checkbox);
+
+                checkBox.setChecked(item.isCompleted());
+
+                int typeface = item.isCompleted() ? Typeface.BOLD_ITALIC : Typeface.NORMAL;
+
+                itemText.setTypeface(null, typeface);
 
                 checkBox.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if(checkBox.isChecked()) {
+                        boolean isComplete = checkBox.isChecked();
+                        writableDB.execSQL("UPDATE " + ToDoDatabaseContract.ToDoEntry.TABLE_NAME + " SET "
+                                + ToDoDatabaseContract.ToDoEntry.COLUMN_NAME_COMPLETED
+                                + " = " + (isComplete ? 1 : 0)
+                                + " WHERE " + ToDoDatabaseContract.ToDoEntry._ID + " = " + item.getId());
+
+                        if (isComplete) {
                             itemText.setTypeface(null, Typeface.BOLD_ITALIC);
-                        }
-                        else {
+                        } else {
                             itemText.setTypeface(null, Typeface.NORMAL);
 
                         }
@@ -70,8 +84,8 @@ public class DeckardActivity extends Activity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                CharSequence inserted =  s.subSequence(start, Math.max(start, start + count));
-                if(inserted.toString().indexOf('\n') >= 0) {
+                CharSequence inserted = s.subSequence(start, Math.max(start, start + count));
+                if (inserted.toString().indexOf('\n') >= 0) {
                     addItem(s.subSequence(0, start), input);
                 }
             }
@@ -96,16 +110,16 @@ public class DeckardActivity extends Activity {
         if (value == null || value.length() == 0) {
             new AlertDialog.Builder(this).setMessage(getString(R.string.input_required)).create().show();
         } else {
-            adapter.insert(value.toString(), 0);
 
             ContentValues values = new ContentValues();
 
             values.put(ToDoDatabaseContract.ToDoEntry.COLUMN_NAME_TEXT, value.toString());
 
-            writableDB.insert(
+            long id = writableDB.insert(
                     ToDoDatabaseContract.ToDoEntry.TABLE_NAME,
                     ToDoDatabaseContract.ToDoEntry.COLUMN_NAME_TEXT,
                     values);
+            adapter.insert(new ToDoItem(id, value.toString(), false), 0);
 
             list.smoothScrollToPosition(0);
         }
@@ -122,8 +136,10 @@ public class DeckardActivity extends Activity {
 
         adapter.clear();
         while (c.moveToNext()) {
-            String value = c.getString(c.getColumnIndex(ToDoDatabaseContract.ToDoEntry.COLUMN_NAME_TEXT));
-            adapter.add(value);
+            long id = c.getLong(c.getColumnIndex(ToDoDatabaseContract.ToDoEntry._ID));
+            String text = c.getString(c.getColumnIndex(ToDoDatabaseContract.ToDoEntry.COLUMN_NAME_TEXT));
+            boolean completed = c.getInt(c.getColumnIndex(ToDoDatabaseContract.ToDoEntry.COLUMN_NAME_COMPLETED)) != 0;
+            adapter.add(new ToDoItem(id, text, completed));
         }
 
         list.setAdapter(adapter);

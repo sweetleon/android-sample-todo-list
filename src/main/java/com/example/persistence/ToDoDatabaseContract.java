@@ -11,5 +11,6 @@ public final class ToDoDatabaseContract {
     public static abstract class ToDoEntry implements BaseColumns {
         public static final String TABLE_NAME = "todo";
         public static final String COLUMN_NAME_TEXT = "text";
+        public static final String COLUMN_NAME_COMPLETED = "complete";
     }
 }

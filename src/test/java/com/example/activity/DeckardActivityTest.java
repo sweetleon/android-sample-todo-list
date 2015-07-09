@@ -193,6 +193,29 @@ public class DeckardActivityTest {
         assertThat(item.getTypeface()).isNull();
     }
 
+    @Test
+    public void testCheckBoxAndBoldFromDB() throws Exception {
+        addItem("hello");
+
+        ListView todoList1 = (ListView) activity.findViewById(android.R.id.list);
+        shadowOf(todoList1).populateItems();
+        CheckBox checkBox1 = (CheckBox) todoList1.getChildAt(0).findViewById(R.id.item_checkbox);
+        checkBox1.performClick();
+
+        activityController = Robolectric.buildActivity(DeckardActivity.class).create().resume().visible();
+        activity = activityController.get();
+
+        ListView todoList2 = (ListView) activity.findViewById(android.R.id.list);
+        shadowOf(todoList2).populateItems();
+
+        CheckBox checkBox2 = (CheckBox) todoList2.getChildAt(0).findViewById(R.id.item_checkbox);
+
+        TextView item2 = (TextView) todoList2.getChildAt(0).findViewById(R.id.item_text);
+        assertThat(checkBox2.isChecked()).isTrue();
+        assertThat(item2.getTypeface().isBold()).isTrue();
+        assertThat(item2.getTypeface().isItalic()).isTrue();
+    }
+
     private TextView addItem(String inputText) {
         TextView input = (TextView) activity.findViewById(R.id.new_item_text);
         input.setText(inputText);

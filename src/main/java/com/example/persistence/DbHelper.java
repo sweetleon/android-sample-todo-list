@@ -3,32 +3,50 @@ package com.example.persistence;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 public class DbHelper extends SQLiteOpenHelper {
-    // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "ToDo.db";
 
-    private static final String TEXT_TYPE = " TEXT";
-    private static final String COMMA_SEP = ",";
-    private static final String SQL_CREATE_ENTRIES =
-            "CREATE TABLE " + ToDoDatabaseContract.ToDoEntry.TABLE_NAME + " (" +
-                    ToDoDatabaseContract.ToDoEntry._ID + " INTEGER PRIMARY KEY," +
-                    ToDoDatabaseContract.ToDoEntry.COLUMN_NAME_TEXT + TEXT_TYPE  +
-            " )";
+    private static DbMigration[] migrations = {
+            new DbMigration() {
+                @Override
+                public void migrate(SQLiteDatabase db) {
+                    db.execSQL("CREATE TABLE " + ToDoDatabaseContract.ToDoEntry.TABLE_NAME + " (" +
+                            ToDoDatabaseContract.ToDoEntry._ID + " INTEGER PRIMARY KEY," +
+                            ToDoDatabaseContract.ToDoEntry.COLUMN_NAME_TEXT + " TEXT" +
+                            " )");
+                }
+            },
+            new DbMigration() {
+                @Override
+                public void migrate(SQLiteDatabase db) {
+                    db.execSQL("ALTER TABLE " + ToDoDatabaseContract.ToDoEntry.TABLE_NAME + " ADD " + ToDoDatabaseContract.ToDoEntry.COLUMN_NAME_COMPLETED + " INTEGER");
+                }
+            }
+    };
 
     public DbHelper(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        super(context, DATABASE_NAME, null, migrations.length);
     }
+
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(SQL_CREATE_ENTRIES);
+        for (DbMigration migration : migrations) {
+            migration.migrate(db);
+        }
     }
+
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        Log.wtf(getClass().getName(), "Can not upgrade yet");
+        if (newVersion > oldVersion)
+        for (int version = oldVersion; version < newVersion; version++) {
+            migrations[version].migrate(db);
+        }
     }
 
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         onUpgrade(db, oldVersion, newVersion);
+    }
+
+    private interface DbMigration {
+        void migrate(SQLiteDatabase db);
     }
 }
