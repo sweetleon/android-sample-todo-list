@@ -5,4 +5,9 @@
     <string name="input_required">Please enter the text</string>
     <string name="app_name">TODO</string>
     <string name="travel">travel</string>
+    <string name="dept_date">Dept Date</string>
+    <string name="return_date">Return Date</string>
+    <string name="dept_city">Dept City</string>
+    <string name="dest_city">Departure City</string>
+    <string name="GO">GO</string>
 </resources>

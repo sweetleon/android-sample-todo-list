@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:columnCount="2"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <TextView android:text="@string/dept_date"    android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+
+    <EditText android:id="@+id/travel_dept_date"
+              android:hint="yyyy-mm-dd"
+              android:layout_gravity="fill_horizontal"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"/>
+
+    <TextView android:text="@string/return_date"    android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+
+    <EditText android:id="@+id/travel_return_date"
+              android:hint="yyyy-mm-dd"
+              android:layout_gravity="fill_horizontal"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"/>
+
+    <TextView android:text="@string/dept_city"   android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+
+    <EditText android:id="@+id/travel_dept_city"
+              android:hint="SFO"
+              android:layout_gravity="fill_horizontal"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"/>
+
+    <TextView android:text="@string/dest_city"   android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+
+    <EditText android:id="@+id/travel_dest_city"
+              android:hint="JFK"
+              android:layout_gravity="fill_horizontal"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"/>
+
+    <Button android:id="@+id/travel_go_button" android:text="@string/GO" />
+
+
+
+
+
+</GridLayout>

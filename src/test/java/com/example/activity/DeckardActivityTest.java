@@ -247,6 +247,8 @@ public class DeckardActivityTest {
         assertThat(nextStartedActivity).isEqualTo(new Intent(activity, TravelSearchActivity.class));
     }
 
+
+
     private TextView addItem(String inputText) {
         TextView input = (TextView) activity.findViewById(R.id.new_item_text);
         input.setText(inputText);
