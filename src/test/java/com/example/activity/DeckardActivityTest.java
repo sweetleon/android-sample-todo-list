@@ -185,9 +185,15 @@ public class DeckardActivityTest {
         CheckBox checkBox = (CheckBox) todoList.getChildAt(0).findViewById(R.id.item_checkbox);
         assertThat(checkBox.isChecked()).isFalse();
 
+        Robolectric.getBackgroundThreadScheduler().pause();
+
         checkBox.performClick();
 
         assertThat(checkBox.isChecked()).isTrue();
+        assertThat(item.getTypeface()).isNull();
+
+        Robolectric.getBackgroundThreadScheduler().unPause();
+
         assertThat(item.getTypeface().isBold()).isTrue();
         assertThat(item.getTypeface().isItalic()).isTrue();
 

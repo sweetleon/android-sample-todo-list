@@ -9,6 +9,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.Spannable;
@@ -70,18 +71,27 @@ public class DeckardActivity extends Activity {
                 checkBox.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        boolean isComplete = checkBox.isChecked();
-                        writableDB.execSQL("UPDATE " + ToDoDatabaseContract.ToDoEntry.TABLE_NAME + " SET "
-                                + ToDoDatabaseContract.ToDoEntry.COLUMN_NAME_COMPLETED
-                                + " = " + (isComplete ? 1 : 0)
-                                + " WHERE " + ToDoDatabaseContract.ToDoEntry._ID + " = " + item.getId());
+                        final boolean isComplete = checkBox.isChecked();
+                        new AsyncTask<Void,Void,Void>() {
+                            @Override
+                            protected Void doInBackground(Void... params) {
+                                writableDB.execSQL("UPDATE " + ToDoDatabaseContract.ToDoEntry.TABLE_NAME + " SET "
+                                        + ToDoDatabaseContract.ToDoEntry.COLUMN_NAME_COMPLETED
+                                        + " = " + (isComplete ? 1 : 0)
+                                        + " WHERE " + ToDoDatabaseContract.ToDoEntry._ID + " = " + item.getId());
+                                return null;
+                            }
 
-                        if (isComplete) {
-                            itemText.setTypeface(null, Typeface.BOLD_ITALIC);
-                        } else {
-                            itemText.setTypeface(null, Typeface.NORMAL);
+                            @Override
+                            protected void onPostExecute(Void aVoid) {
+                                if (isComplete) {
+                                    itemText.setTypeface(null, Typeface.BOLD_ITALIC);
+                                } else {
+                                    itemText.setTypeface(null, Typeface.NORMAL);
+                                }
+                            }
+                        }.execute();
 
-                        }
                     }
                 });
                 return view;
