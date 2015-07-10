@@ -38,7 +38,13 @@
 
     <Button android:id="@+id/travel_go_button" android:text="@string/GO" />
 
+    <ProgressBar android:id="@android:id/progress" android:visibility="gone"/>
 
+    <ListView
+            android:id="@android:id/list"
+            android:layout_columnSpan="2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
 
 
 

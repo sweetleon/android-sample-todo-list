@@ -10,4 +10,7 @@
     <string name="dept_city">Dept City</string>
     <string name="dest_city">Departure City</string>
     <string name="GO">GO</string>
+    <string name="airline">Airline</string>
+    <string name="times">times</string>
+    <string name="number_of_stops">%d stop(s)</string>
 </resources>

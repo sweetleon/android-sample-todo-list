@@ -16,6 +16,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
+import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 import org.robolectric.annotation.Implementation;
 import org.robolectric.annotation.Implements;
@@ -25,12 +26,12 @@ import org.robolectric.util.ActivityController;
 
 import static junit.framework.Assert.fail;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.robolectric.Robolectric.directlyOn;
-import static org.robolectric.Robolectric.shadowOf;
+import static org.robolectric.Shadows.shadowOf;
+import static org.robolectric.internal.Shadow.directlyOn;
 
 
 @RunWith(RobolectricTestRunner.class)
-@Config(manifest = "src/main/AndroidManifest.xml", emulateSdk = 18)
+@Config(manifest = "src/main/AndroidManifest.xml", sdk = 18)
 public class DeckardActivityTest {
 
     private ActivityController<DeckardActivity> activityController;
@@ -206,7 +207,6 @@ public class DeckardActivityTest {
 
         activityController = Robolectric.buildActivity(DeckardActivity.class).create().resume().visible();
         activity = activityController.get();
-
         ListView todoList2 = (ListView) activity.findViewById(android.R.id.list);
         shadowOf(todoList2).populateItems();
 
@@ -227,10 +227,10 @@ public class DeckardActivityTest {
         shadowOf(todoList).populateItems();
 
         TextView travel = (TextView) todoList.getChildAt(0).findViewById(R.id.item_text);
-        assertThat(travel.getCurrentTextColor()).isEqualTo(Robolectric.application.getResources().getColor(android.R.color.holo_blue_dark));
+        assertThat(travel.getCurrentTextColor()).isEqualTo(RuntimeEnvironment.application.getResources().getColor(android.R.color.holo_blue_dark));
 
         TextView hello = (TextView) todoList.getChildAt(1).findViewById(R.id.item_text);
-        assertThat(hello.getCurrentTextColor()).isNotEqualTo(Robolectric.application.getResources().getColor(android.R.color.holo_blue_dark));
+        assertThat(hello.getCurrentTextColor()).isNotEqualTo(RuntimeEnvironment.application.getResources().getColor(android.R.color.holo_blue_dark));
     }
 
     @Test
