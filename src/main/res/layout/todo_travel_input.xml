@@ -38,7 +38,7 @@
 
     <Button android:id="@+id/travel_go_button" android:text="@string/GO" />
 
-
+    <ProgressBar android:id="@android:id/progress" android:visibility="gone"/>
 
 
 

@@ -1,0 +1,3 @@
+[submodule "signpost-retrofit"]
+	path = signpost-retrofit
+	url = https://github.com/pakerfeldt/signpost-retrofit
