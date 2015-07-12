@@ -72,15 +72,22 @@ public class DeckardActivity extends Activity {
                     @Override
                     public void onClick(View v) {
                         final boolean isComplete = checkBox.isChecked();
-                        writableDB.execSQL("UPDATE " + ToDoDatabaseContract.ToDoEntry.TABLE_NAME + " SET "
-                                + ToDoDatabaseContract.ToDoEntry.COLUMN_NAME_COMPLETED
-                                + " = " + (isComplete ? 1 : 0)
-                                + " WHERE " + ToDoDatabaseContract.ToDoEntry._ID + " = " + item.getId());
-                        if (isComplete) {
-                            itemText.setTypeface(null, Typeface.BOLD_ITALIC);
-                        } else {
-                            itemText.setTypeface(null, Typeface.NORMAL);
-                        }
+                        AsyncTask asyncTask = new AsyncTask() {
+                            @Override
+                            protected Object doInBackground(Object[] objects) {
+                                writableDB.execSQL("UPDATE " + ToDoDatabaseContract.ToDoEntry.TABLE_NAME + " SET "
+                                        + ToDoDatabaseContract.ToDoEntry.COLUMN_NAME_COMPLETED
+                                        + " = " + (isComplete ? 1 : 0)
+                                        + " WHERE " + ToDoDatabaseContract.ToDoEntry._ID + " = " + item.getId());
+                                if (isComplete) {
+                                    itemText.setTypeface(null, Typeface.BOLD_ITALIC);
+                                } else {
+                                    itemText.setTypeface(null, Typeface.NORMAL);
+                                }
+                                return null;
+                            }
+                        }.execute();
+
                     }
                 });
                 return view;
