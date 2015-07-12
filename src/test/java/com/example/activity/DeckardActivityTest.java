@@ -5,6 +5,7 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Typeface;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ListView;
@@ -185,17 +186,10 @@ public class DeckardActivityTest {
         CheckBox checkBox = (CheckBox) todoList.getChildAt(0).findViewById(R.id.item_checkbox);
         assertThat(checkBox.isChecked()).isFalse();
 
-        Robolectric.getBackgroundThreadScheduler().pause();
-
         checkBox.performClick();
 
         assertThat(checkBox.isChecked()).isTrue();
-        assertThat(item.getTypeface()).isNull();
-
-        Robolectric.getBackgroundThreadScheduler().unPause();
-
-        assertThat(item.getTypeface().isBold()).isTrue();
-        assertThat(item.getTypeface().isItalic()).isTrue();
+        assertThat(item.getTypeface().getStyle()).isEqualTo(Typeface.BOLD_ITALIC);
 
         checkBox.performClick();
 
@@ -220,8 +214,8 @@ public class DeckardActivityTest {
 
         TextView item2 = (TextView) todoList2.getChildAt(0).findViewById(R.id.item_text);
         assertThat(checkBox2.isChecked()).isTrue();
-        assertThat(item2.getTypeface().isBold()).isTrue();
-        assertThat(item2.getTypeface().isItalic()).isTrue();
+        assertThat(item2.getTypeface().getStyle()).isEqualTo(Typeface.BOLD_ITALIC);
+
     }
 
     @Test
